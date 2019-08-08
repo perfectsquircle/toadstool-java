@@ -4,3 +4,8 @@
 # Ignore Gradle build output directory
 build
 bin
+
+# Ignore VSCode Java plugin junk
+.classpath
+.project
+.settings
