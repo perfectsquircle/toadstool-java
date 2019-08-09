@@ -7,6 +7,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.sql.SQLException;
+import java.util.List;
 
 public class LibraryTest {
     @Test
@@ -35,7 +36,7 @@ public class LibraryTest {
         var results = context
             .prepareStatement("select 1 as a, 2 as b, 3 as c, 4 as d where 'bar' = @foo")
             .withParameter("foo", "bar")
-            .ToListOf(Foo.class);
+            .toListOf(Foo.class);
         // @formatter:on
 
         assertNotNull(results);

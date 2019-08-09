@@ -55,7 +55,7 @@ class PreparedStatementBuilder implements StatementBuilder {
     }
 
     @Override
-    public <E> List<E> ToListOf(Class<E> targetClass) throws SQLException {
+    public <E> List<E> toListOf(Class<E> targetClass) throws SQLException {
         var mapper = new SimpleResultSetMapper();
         var connection = this.context.getConnection();
         try (var preparedStatement = this.build(connection); var resultSet = preparedStatement.executeQuery();) {
@@ -71,12 +71,12 @@ class PreparedStatementBuilder implements StatementBuilder {
     }
 
     @Override
-    public <E> E First() throws SQLException {
+    public <E> E first() throws SQLException {
         return null;
     }
 
     @Override
-    public int Execute() throws SQLException {
+    public int execute() throws SQLException {
         return 0;
     }
 }
