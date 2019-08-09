@@ -61,7 +61,7 @@ class PreparedStatementBuilder implements StatementBuilder {
         try (var preparedStatement = this.build(connection); var resultSet = preparedStatement.executeQuery();) {
             var list = new ArrayList<E>();
             var resultSetMetadata = resultSet.getMetaData();
-            var mappity = mapper.CompileMapper(targetClass, resultSetMetadata);
+            var mappity = mapper.compileMapper(targetClass, resultSetMetadata);
             while (resultSet.next()) {
                 var instance = mappity.apply(resultSet);
                 list.add(instance);

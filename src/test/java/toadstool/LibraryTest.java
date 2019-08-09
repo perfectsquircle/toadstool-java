@@ -14,8 +14,12 @@ public class LibraryTest {
         var context = new DefaultDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
         var connection = context.getConnection();
 
-        var result = context.prepareStatement("select 1 as a, 2 as b, 3 as c where 'bar' = @foo")
-                .withParameter("foo", "bar").build(connection);
+        // @formatter:off
+        var result = context
+            .prepareStatement("select 1 as a, 2 as b, 3 as c where 'bar' = @foo")
+            .withParameter("foo", "bar")
+            .build(connection);
+        // @formatter:on        
 
         assertNotNull(result);
         var parameterMetadata = result.getParameterMetaData();
@@ -27,13 +31,19 @@ public class LibraryTest {
     public void testToList() throws SQLException {
         var context = new DefaultDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
 
-        var results = context.prepareStatement("select 1 as a, 2 as b, 3 as c where 'bar' = @foo")
-                .withParameter("foo", "bar").ToListOf(Foo.class);
+        // @formatter:off
+        var results = context
+            .prepareStatement("select 1 as a, 2 as b, 3 as c, 4 as d where 'bar' = @foo")
+            .withParameter("foo", "bar")
+            .ToListOf(Foo.class);
+        // @formatter:on
 
         assertNotNull(results);
         assertEquals(1, results.size());
         var first = results.get(0);
         assertNotNull(first);
-        assertEquals(1, first.a);
+        assertEquals(1, first.getA());
+        assertEquals(2, first.getB());
+        assertEquals(3, first.getC());
     }
 }
