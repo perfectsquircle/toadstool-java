@@ -6,9 +6,20 @@ package toadstool;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import java.sql.SQLException;
+
 public class LibraryTest {
-    @Test public void testSomeLibraryMethod() {
-        Library classUnderTest = new Library();
-        assertTrue("someLibraryMethod should return 'true'", classUnderTest.someLibraryMethod());
+    @Test
+    public void testSomeLibraryMethod() throws SQLException {
+        var context = new DefaultDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
+        var connection = context.getConnection();
+
+        var result = context.prepareStatement("select 1 as a, 2 as b, 3 as c where 'bar' = @foo")
+                .withParameter("foo", "bar").build(connection);
+
+        assertNotNull(result);
+        var parameterMetadata = result.getParameterMetaData();
+        assertNotNull(parameterMetadata);
+        assertEquals(1, parameterMetadata.getParameterCount());
     }
 }
