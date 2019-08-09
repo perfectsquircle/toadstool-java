@@ -22,4 +22,18 @@ public class LibraryTest {
         assertNotNull(parameterMetadata);
         assertEquals(1, parameterMetadata.getParameterCount());
     }
+
+    @Test
+    public void testToList() throws SQLException {
+        var context = new DefaultDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
+
+        var results = context.prepareStatement("select 1 as a, 2 as b, 3 as c where 'bar' = @foo")
+                .withParameter("foo", "bar").ToListOf(Foo.class);
+
+        assertNotNull(results);
+        assertEquals(1, results.size());
+        var first = results.get(0);
+        assertNotNull(first);
+        assertEquals(1, first.a);
+    }
 }

@@ -1,0 +1,5 @@
+package toadstool;
+
+interface ResultSetMapper {
+
+}

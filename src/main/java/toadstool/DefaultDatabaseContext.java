@@ -12,14 +12,14 @@ public class DefaultDatabaseContext implements DatabaseContext {
         this.url = url;
     }
 
-    Connection getConnection() throws SQLException {
+    @Override
+    public Connection getConnection() throws SQLException {
         var connection = DriverManager.getConnection(url);
         return connection;
     }
 
     @Override
     public StatementBuilder prepareStatement(String sql) throws SQLException {
-        // var connection = getConnection();
-        return new PreparedStatementBuilder(sql);
+        return new PreparedStatementBuilder(sql).withContext(this);
     }
 }
