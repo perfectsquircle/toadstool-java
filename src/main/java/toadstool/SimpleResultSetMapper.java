@@ -1,9 +1,7 @@
 package toadstool;
 
-import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -11,38 +9,30 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 class SimpleResultSetMapper implements ResultSetMapper {
-    public <E> Function<ResultSet, E> compileMapper(Class<E> targetClass, ResultSetMetaData resultSetMetadata) {
-        try {
-            var columnToPropertyMap = createColumnToPropertyMap(targetClass, resultSetMetadata);
+    public <E> ThrowingFunction<ResultSet, E> compileMapper(Class<E> targetClass, ResultSetMetaData resultSetMetadata)
+            throws Exception {
+        var columnToPropertyMap = createColumnToPropertyMap(targetClass, resultSetMetadata);
 
-            Function<ResultSet, E> x = (resultSet) -> {
-                try {
-                    var instance = targetClass.getDeclaredConstructor().newInstance();
-                    var typedInstance = targetClass.cast(instance);
+        return (resultSet) -> {
+            var instance = targetClass.getDeclaredConstructor().newInstance();
+            var typedInstance = targetClass.cast(instance);
 
-                    for (var columnName : columnToPropertyMap.keySet()) {
-                        var setter = columnToPropertyMap.get(columnName);
-                        if (setter.canAccess(typedInstance)) {
-                            setter.invoke(typedInstance, resultSet.getObject(columnName));
-                        }
-                    }
-
-                    return typedInstance;
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
+            for (var columnName : columnToPropertyMap.keySet()) {
+                var setter = columnToPropertyMap.get(columnName);
+                if (setter.canAccess(typedInstance)) {
+                    setter.invoke(typedInstance, resultSet.getObject(columnName));
                 }
-            };
-            return x;
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+            }
+
+            return typedInstance;
+        };
     }
 
-    public <E> Map<String, Method> createColumnToPropertyMap(Class<E> targetClass, ResultSetMetaData resultSetMetadata)
+    private <E> Map<String, Method> createColumnToPropertyMap(Class<E> targetClass, ResultSetMetaData resultSetMetadata)
             throws SQLException, IntrospectionException {
         var map = new HashMap<String, Method>();
         var beanInfo = Introspector.getBeanInfo(targetClass);
@@ -75,7 +65,7 @@ class SimpleResultSetMapper implements ResultSetMapper {
 
     // @formatter:off
     private Collection<String> getVariants(String s) {
-        return Arrays.asList(
+        return List.of(
             s,
             s.toLowerCase(),
             s.replaceAll("_", ""),
