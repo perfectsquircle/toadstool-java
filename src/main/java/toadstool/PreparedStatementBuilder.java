@@ -68,9 +68,11 @@ class PreparedStatementBuilder implements StatementBuilder {
     public <E> List<E> toListOf(Class<E> targetClass) throws SQLException {
         return withResultSet((ResultSet resultSet) -> {
             var list = new ArrayList<E>();
-            var resultSetMetadata = resultSet.getMetaData();
-            var mapper = resultSetMapper.compileMapper(targetClass, resultSetMetadata);
+            Function<ResultSet, E> mapper = null;
             while (resultSet.next()) {
+                if (mapper == null) {
+                    mapper = resultSetMapper.compileMapper(targetClass, resultSet.getMetaData());
+                }
                 var instance = mapper.apply(resultSet);
                 list.add(instance);
             }
@@ -89,10 +91,10 @@ class PreparedStatementBuilder implements StatementBuilder {
     @Override
     public <E> Optional<E> first(Class<E> targetClass) throws SQLException {
         return withResultSet((ResultSet resultSet) -> {
-            var resultSetMetadata = resultSet.getMetaData();
-            var mapper = resultSetMapper.compileMapper(targetClass, resultSetMetadata);
             E instance = null;
             if (resultSet.next()) {
+                var resultSetMetadata = resultSet.getMetaData();
+                var mapper = resultSetMapper.compileMapper(targetClass, resultSetMetadata);
                 instance = mapper.apply(resultSet);
             }
             return Optional.of(instance);
