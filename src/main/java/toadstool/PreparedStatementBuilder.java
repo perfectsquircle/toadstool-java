@@ -13,20 +13,22 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 class PreparedStatementBuilder implements StatementBuilder {
     private final Map<String, Object> parameters;
-    private final List<Object> indexedParameters;
     private String sql;
     private DatabaseContext context;
     private ResultSetMapper resultSetMapper;
 
+    private static final Pattern parameterPattern = Pattern.compile("(@(\\w+))");
+
     public PreparedStatementBuilder() {
         super();
         this.parameters = new HashMap<String, Object>();
-        this.indexedParameters = new ArrayList<>();
         this.resultSetMapper = new SimpleResultSetMapper();
     }
 
@@ -46,7 +48,9 @@ class PreparedStatementBuilder implements StatementBuilder {
     }
 
     public PreparedStatement build(Connection connection) throws SQLException {
-        var formattedSql = formatSql();
+        var pair = formatSql();
+        var formattedSql = pair.left;
+        var indexedParameters = pair.right;
         var preparedStatement = connection.prepareStatement(formattedSql);
         var i = 1;
         for (var parameter : indexedParameters) {
@@ -55,13 +59,26 @@ class PreparedStatementBuilder implements StatementBuilder {
         return preparedStatement;
     }
 
-    private String formatSql() {
+    private Pair<String, List<Object>> formatSql() {
         var formattedSql = sql;
-        for (var key : parameters.keySet()) {
-            formattedSql = formattedSql.replaceFirst("@" + key, "?");
-            indexedParameters.add(parameters.get(key));
+        var indexedParameters = new ArrayList<>();
+
+        var pattern = parameterPattern;
+        Matcher matcher = null;
+        int lastIndex = 0;
+        while (lastIndex < formattedSql.length()) {
+            matcher = pattern.matcher(formattedSql);
+            if (!matcher.find(lastIndex)) {
+                break;
+            }
+            lastIndex = matcher.end();
+            var parameterName = matcher.group(2);
+            if (parameters.containsKey(parameterName)) {
+                formattedSql = matcher.replaceFirst("?");
+                indexedParameters.add(parameters.get(parameterName));
+            }
         }
-        return formattedSql;
+        return new Pair<String, List<Object>>(formattedSql, indexedParameters);
     }
 
     @Override

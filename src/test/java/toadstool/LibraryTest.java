@@ -67,4 +67,24 @@ public class LibraryTest {
         assertEquals(2, first.getB());
         assertEquals(3, first.getC());
     }
+
+    @Test
+    public void testMultipleParameterUse() throws SQLException {
+        var context = new DefaultDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
+
+        // @formatter:off
+        var result = context
+            .prepareStatement("select 1 as a, 2 as b, 3 as c, 4 as d where 'bar' = @foo or 'bat' = @foo or 'baz' = @foo or 'bag' = '@banana'")
+            .withParameter("foo", "bar")
+            .first(Foo.class);
+        // @formatter:on
+
+        assertNotNull(result);
+        assertTrue("Optional must not be empty", result.isPresent());
+        var first = result.get();
+        assertNotNull(first);
+        assertEquals(1, first.getA());
+        assertEquals(2, first.getB());
+        assertEquals(3, first.getC());
+    }
 }
