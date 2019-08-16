@@ -1,5 +1,6 @@
 package toadstool;
 
+import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -24,6 +25,7 @@ class PreparedStatementBuilder implements StatementBuilder {
     private DatabaseContext context;
     private ResultSetMapper resultSetMapper;
 
+    private static final Pattern validParameterName = Pattern.compile("^\\w+$");
     private static final Pattern parameterPattern = Pattern.compile("(@(\\w+))");
 
     public PreparedStatementBuilder() {
@@ -37,13 +39,16 @@ class PreparedStatementBuilder implements StatementBuilder {
         this.sql = sql;
     }
 
-    public StatementBuilder withContext(DatabaseContext context) {
+    StatementBuilder withContext(DatabaseContext context) {
         this.context = context;
         return this;
     }
 
-    public StatementBuilder withParameter(String key, Object value) {
-        parameters.put(key, value);
+    public StatementBuilder withParameter(String parameterName, Object value) {
+        if (!validParameterName.matcher(parameterName).matches()) {
+            throw new InvalidParameterException("Parameter name is not in allowed format.");
+        }
+        parameters.put(parameterName, value);
         return this;
     }
 
