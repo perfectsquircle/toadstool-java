@@ -1,6 +1,5 @@
 package toadstool;
 
-import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -46,7 +45,7 @@ class PreparedStatementBuilder implements StatementBuilder {
 
     public StatementBuilder withParameter(String parameterName, Object value) {
         if (!validParameterName.matcher(parameterName).matches()) {
-            throw new InvalidParameterException("Parameter name is not in allowed format.");
+            throw new IllegalArgumentException("Parameter name is not in allowed format.");
         }
         parameters.put(parameterName, value);
         return this;

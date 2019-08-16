@@ -4,11 +4,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DefaultDatabaseContext implements DatabaseContext {
+public class SimpleDatabaseContext implements DatabaseContext {
     private String url;
 
-    public DefaultDatabaseContext(String url) {
+    public SimpleDatabaseContext(String url) {
         super();
+        if (url == null) {
+            throw new IllegalArgumentException("url cannot be null");
+        }
         this.url = url;
     }
 
@@ -20,6 +23,9 @@ public class DefaultDatabaseContext implements DatabaseContext {
 
     @Override
     public StatementBuilder prepareStatement(String sql) throws SQLException {
+        if (sql == null) {
+            throw new IllegalArgumentException("sql cannot be null");
+        }
         return new PreparedStatementBuilder(sql).withContext(this);
     }
 }
