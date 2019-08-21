@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -35,10 +36,12 @@ class PreparedStatementBuilder implements StatementBuilder {
 
     public PreparedStatementBuilder(String sql) {
         this();
+        Objects.requireNonNull(sql);
         this.sql = sql;
     }
 
     StatementBuilder withContext(DatabaseContext context) {
+        Objects.requireNonNull(context);
         this.context = context;
         return this;
     }
@@ -52,6 +55,7 @@ class PreparedStatementBuilder implements StatementBuilder {
     }
 
     public PreparedStatement build(Connection connection) throws SQLException {
+        Objects.requireNonNull(sql);
         var pair = formatSql();
         var formattedSql = pair.left;
         var indexedParameters = pair.right;
@@ -63,7 +67,7 @@ class PreparedStatementBuilder implements StatementBuilder {
         return preparedStatement;
     }
 
-    private Pair<String, List<Object>> formatSql() {
+    Pair<String, List<Object>> formatSql() {
         var formattedSql = sql;
         var indexedParameters = new ArrayList<>();
 

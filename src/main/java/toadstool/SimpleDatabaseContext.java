@@ -3,15 +3,14 @@ package toadstool;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Objects;
 
 public class SimpleDatabaseContext implements DatabaseContext {
     private String url;
 
     public SimpleDatabaseContext(String url) {
         super();
-        if (url == null) {
-            throw new IllegalArgumentException("url cannot be null");
-        }
+        Objects.requireNonNull(url);
         this.url = url;
     }
 
@@ -23,9 +22,7 @@ public class SimpleDatabaseContext implements DatabaseContext {
 
     @Override
     public StatementBuilder prepareStatement(String sql) throws SQLException {
-        if (sql == null) {
-            throw new IllegalArgumentException("sql cannot be null");
-        }
+        Objects.requireNonNull(sql);
         return new PreparedStatementBuilder(sql).withContext(this);
     }
 }

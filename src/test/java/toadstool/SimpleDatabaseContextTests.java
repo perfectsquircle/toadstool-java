@@ -18,7 +18,7 @@ public class SimpleDatabaseContextTests {
         assertNotNull(context);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void ShouldNotAllowNullUri() {
         // Given
         String url = null;
@@ -43,7 +43,7 @@ public class SimpleDatabaseContextTests {
         assertNotNull(preparedStatement);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = NullPointerException.class)
     public void ShouldNotAllowNullSql() throws SQLException {
         // Given
         var context = new SimpleDatabaseContext("nuffin");
