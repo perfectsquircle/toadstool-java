@@ -32,7 +32,7 @@ class SimpleResultSetMapper implements ResultSetMapper {
         };
     }
 
-    private <E> Map<String, Method> createColumnToPropertyMap(Class<E> targetClass, ResultSetMetaData resultSetMetadata)
+    public <E> Map<String, Method> createColumnToPropertyMap(Class<E> targetClass, ResultSetMetaData resultSetMetadata)
             throws SQLException, IntrospectionException {
         var map = new HashMap<String, Method>();
         var beanInfo = Introspector.getBeanInfo(targetClass);

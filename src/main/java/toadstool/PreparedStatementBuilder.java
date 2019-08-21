@@ -67,7 +67,7 @@ class PreparedStatementBuilder implements StatementBuilder {
         return preparedStatement;
     }
 
-    Pair<String, List<Object>> formatSql() {
+    public Pair<String, List<Object>> formatSql() {
         var formattedSql = sql;
         var indexedParameters = new ArrayList<>();
 
