@@ -7,12 +7,11 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.sql.SQLException;
-import java.util.List;
 
 public class LibraryTest {
     @Test
     public void testSomeLibraryMethod() throws SQLException {
-        var context = new DefaultDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
+        var context = new SimpleDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
         var connection = context.getConnection();
 
         // @formatter:off
@@ -30,7 +29,7 @@ public class LibraryTest {
 
     @Test
     public void testToList() throws SQLException {
-        var context = new DefaultDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
+        var context = new SimpleDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
 
         // @formatter:off
         var results = context
@@ -50,7 +49,7 @@ public class LibraryTest {
 
     @Test
     public void testFirst() throws SQLException {
-        var context = new DefaultDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
+        var context = new SimpleDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
 
         // @formatter:off
         var result = context
@@ -70,7 +69,7 @@ public class LibraryTest {
 
     @Test
     public void testMultipleParameterUse() throws SQLException {
-        var context = new DefaultDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
+        var context = new SimpleDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
 
         // @formatter:off
         var result = context

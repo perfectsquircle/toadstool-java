@@ -1,6 +1,5 @@
 package toadstool;
 
-import java.security.InvalidParameterException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
@@ -36,23 +36,26 @@ class PreparedStatementBuilder implements StatementBuilder {
 
     public PreparedStatementBuilder(String sql) {
         this();
+        Objects.requireNonNull(sql);
         this.sql = sql;
     }
 
     StatementBuilder withContext(DatabaseContext context) {
+        Objects.requireNonNull(context);
         this.context = context;
         return this;
     }
 
     public StatementBuilder withParameter(String parameterName, Object value) {
         if (!validParameterName.matcher(parameterName).matches()) {
-            throw new InvalidParameterException("Parameter name is not in allowed format.");
+            throw new IllegalArgumentException("Parameter name is not in allowed format.");
         }
         parameters.put(parameterName, value);
         return this;
     }
 
     public PreparedStatement build(Connection connection) throws SQLException {
+        Objects.requireNonNull(sql);
         var pair = formatSql();
         var formattedSql = pair.left;
         var indexedParameters = pair.right;
@@ -64,7 +67,7 @@ class PreparedStatementBuilder implements StatementBuilder {
         return preparedStatement;
     }
 
-    private Pair<String, List<Object>> formatSql() {
+    public Pair<String, List<Object>> formatSql() {
         var formattedSql = sql;
         var indexedParameters = new ArrayList<>();
 

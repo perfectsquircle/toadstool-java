@@ -3,7 +3,7 @@ package toadstool;
 import java.util.function.Function;
 
 @FunctionalInterface
-public interface ThrowingFunction<T, R> extends Function<T, R> {
+interface ThrowingFunction<T, R> extends Function<T, R> {
 
     @Override
     default R apply(final T elem) {
