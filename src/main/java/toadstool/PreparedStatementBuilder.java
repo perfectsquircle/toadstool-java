@@ -122,7 +122,7 @@ class PreparedStatementBuilder implements StatementBuilder {
                 var mapper = resultSetMapper.compileMapper(targetClass, resultSetMetadata);
                 instance = mapper.apply(resultSet);
             }
-            return Optional.of(instance);
+            return Optional.ofNullable(instance);
         });
     }
 
