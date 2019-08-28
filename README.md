@@ -9,3 +9,35 @@ List<Customer> customers = context
     .withParameter("lastName", "Cuervo")
     .toListOf(Customer.class);
 ```
+
+## Testing
+
+Prerequisites:
+* JDK 12
+* Gnu Make
+* Docker
+* Bash
+
+Running the integration tests requires having a recent version of Docker installed. Two database servers (PostgreSQL and SQL Server) will be brought up with 
+
+```bash
+make databases
+```
+
+After the servers are up and the databases are restored, the tests can be run.
+
+```bash
+make test
+```
+
+To bring down the servers and clean up the backup files,
+
+```bash
+make clean-databases
+```
+
+---
+
+Built with &hearts; by Calvin.
+
+&copy; Calvin Furano

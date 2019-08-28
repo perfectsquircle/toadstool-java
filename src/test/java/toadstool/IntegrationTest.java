@@ -4,14 +4,40 @@
 package toadstool;
 
 import org.junit.Test;
+import org.junit.experimental.theories.DataPoints;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
 import static org.junit.Assert.*;
 
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.List;
 
-public class LibraryTest {
+@RunWith(Parameterized.class)
+public class IntegrationTest {
+    // @formatter:off
+    @Parameterized.Parameters(name = "connectionStrings")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(new Object[][] {
+                { "jdbc:postgresql://localhost:5432/postgres", "postgres", "toadstool" },
+        });
+    }
+    // @formatter:on
+
+    private String connectionString;
+    private String user;
+    private String password;
+
+    public IntegrationTest(String connectionString, String user, String password) {
+        this.connectionString = connectionString;
+        this.user = user;
+        this.password = password;
+    }
+
     @Test
-    public void testSomeLibraryMethod() throws SQLException {
-        var context = new SimpleDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
+    public void testBuild() throws SQLException {
+        var context = new SimpleDatabaseContext(connectionString, user, password);
         var connection = context.getConnection();
 
         // @formatter:off
@@ -29,7 +55,7 @@ public class LibraryTest {
 
     @Test
     public void testToList() throws SQLException {
-        var context = new SimpleDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
+        var context = new SimpleDatabaseContext(connectionString, user, password);
 
         // @formatter:off
         var results = context
@@ -49,7 +75,7 @@ public class LibraryTest {
 
     @Test
     public void testFirst() throws SQLException {
-        var context = new SimpleDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
+        var context = new SimpleDatabaseContext(connectionString, user, password);
 
         // @formatter:off
         var result = context
@@ -69,7 +95,7 @@ public class LibraryTest {
 
     @Test
     public void testMultipleParameterUse() throws SQLException {
-        var context = new SimpleDatabaseContext("jdbc:postgresql://localhost:5432/tranquility");
+        var context = new SimpleDatabaseContext(connectionString, user, password);
 
         // @formatter:off
         var result = context

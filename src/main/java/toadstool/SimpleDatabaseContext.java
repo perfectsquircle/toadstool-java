@@ -4,20 +4,38 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Objects;
+import java.util.Optional;
 
 public class SimpleDatabaseContext implements DatabaseContext {
-    private String url;
+    private final String url;
+    private final Optional<String> user;
+    private final Optional<String> password;
 
     public SimpleDatabaseContext(String url) {
         super();
         Objects.requireNonNull(url);
         this.url = url;
+        this.user = Optional.empty();
+        this.password = Optional.empty();
+    }
+
+    public SimpleDatabaseContext(String url, String user, String password) {
+        super();
+        Objects.requireNonNull(url);
+        Objects.requireNonNull(user);
+        Objects.requireNonNull(password);
+        this.url = url;
+        this.user = Optional.of(user);
+        this.password = Optional.of(password);
     }
 
     @Override
     public Connection getConnection() throws SQLException {
-        var connection = DriverManager.getConnection(url);
-        return connection;
+        if (user.isPresent() && password.isPresent()) {
+            return DriverManager.getConnection(url, user.get(), password.get());
+        } else {
+            return DriverManager.getConnection(url);
+        }
     }
 
     @Override
