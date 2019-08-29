@@ -3,28 +3,25 @@
  */
 package toadstool;
 
-import org.junit.Test;
-import org.junit.experimental.theories.DataPoints;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
-
-import static org.junit.Assert.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import java.sql.SQLException;
 import java.util.Arrays;
-import java.util.List;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public class IntegrationTest {
-    // @formatter:off
-    @Parameterized.Parameters(name = "connectionStrings")
+    @Parameters(name = "connectionStrings")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][] {
-                { "jdbc:postgresql://localhost:5432/postgres", "postgres", "toadstool" },
-                { "jdbc:sqlserver://localhost:1433;", "SA", "Toadstool123" },
+                {"jdbc:postgresql://localhost:5432/postgres", "postgres", "toadstool"},
+                {"jdbc:sqlserver://localhost:1433;", "SA", "Toadstool123"},
         });
     }
-    // @formatter:on
 
     private String connectionString;
     private String user;
@@ -41,12 +38,10 @@ public class IntegrationTest {
         var context = new SimpleDatabaseContext(connectionString, user, password);
         var connection = context.getConnection();
 
-        // @formatter:off
         var result = context
-            .prepareStatement("select 1 as a, 2 as b, 3 as c where 'bar' = @foo")
-            .withParameter("foo", "bar")
-            .build(connection);
-        // @formatter:on        
+                .prepareStatement("select 1 as a, 2 as b, 3 as c where 'bar' = @foo")
+                .withParameter("foo", "bar")
+                .build(connection);
 
         assertNotNull(result);
         var parameterMetadata = result.getParameterMetaData();
@@ -58,12 +53,10 @@ public class IntegrationTest {
     public void testToList() throws SQLException {
         var context = new SimpleDatabaseContext(connectionString, user, password);
 
-        // @formatter:off
         var results = context
-            .prepareStatement("select 1 as a, 2 as b, 3 as c, 4 as d where 'bar' = @foo")
-            .withParameter("foo", "bar")
-            .toListOf(Foo.class);
-        // @formatter:on
+                .prepareStatement("select 1 as a, 2 as b, 3 as c, 4 as d where 'bar' = @foo")
+                .withParameter("foo", "bar")
+                .toListOf(Foo.class);
 
         assertNotNull(results);
         assertEquals(1, results.size());
@@ -78,12 +71,10 @@ public class IntegrationTest {
     public void testFirst() throws SQLException {
         var context = new SimpleDatabaseContext(connectionString, user, password);
 
-        // @formatter:off
         var result = context
-            .prepareStatement("select 1 as a, 2 as b, 3 as c, 4 as d where 'bar' = @foo")
-            .withParameter("foo", "bar")
-            .first(Foo.class);
-        // @formatter:on
+                .prepareStatement("select 1 as a, 2 as b, 3 as c, 4 as d where 'bar' = @foo")
+                .withParameter("foo", "bar")
+                .first(Foo.class);
 
         assertNotNull(result);
         assertTrue("Optional must not be empty", result.isPresent());
@@ -98,12 +89,11 @@ public class IntegrationTest {
     public void testMultipleParameterUse() throws SQLException {
         var context = new SimpleDatabaseContext(connectionString, user, password);
 
-        // @formatter:off
         var result = context
-            .prepareStatement("select 1 as a, 2 as b, 3 as c, 4 as d where 'bar' = @foo or 'bat' = @foo or 'baz' = @foo or 'bag' = '@banana'")
-            .withParameter("foo", "bar")
-            .first(Foo.class);
-        // @formatter:on
+                .prepareStatement(
+                        "select 1 as a, 2 as b, 3 as c, 4 as d where 'bar' = @foo or 'bat' = @foo or 'baz' = @foo or 'bag' = '@banana'")
+                .withParameter("foo", "bar")
+                .first(Foo.class);
 
         assertNotNull(result);
         assertTrue("Optional must not be empty", result.isPresent());

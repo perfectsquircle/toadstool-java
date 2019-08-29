@@ -7,7 +7,7 @@ local:
 
 .PHONY: test
 test:
-	./gradlew test
+	./gradlew test --info
 
 clean:
 	rm -vrf build
