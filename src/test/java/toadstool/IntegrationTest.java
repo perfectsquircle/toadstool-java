@@ -21,6 +21,7 @@ public class IntegrationTest {
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][] {
                 { "jdbc:postgresql://localhost:5432/postgres", "postgres", "toadstool" },
+                { "jdbc:sqlserver://localhost:1433;", "SA", "Toadstool123" },
         });
     }
     // @formatter:on
