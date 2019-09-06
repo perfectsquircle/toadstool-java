@@ -63,14 +63,11 @@ class SimpleResultSetMapper implements ResultSetMapper {
         return map;
     }
 
-    // @formatter:off
     private Collection<String> getVariants(String s) {
         return List.of(
-            s,
-            s.toLowerCase(),
-            s.replaceAll("_", ""),
-            s.replaceAll("_", "").toLowerCase()
-        );
+                s,
+                s.toLowerCase(),
+                s.replaceAll("_", ""),
+                s.replaceAll("_", "").toLowerCase());
     }
-    // @formatter:on
 }
