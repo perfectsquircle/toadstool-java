@@ -13,17 +13,20 @@ import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import toadstool.mapper.ResultSetMapper;
+import toadstool.mapper.ResultSetMapperFactory;
+import toadstool.mapper.SimpleResultSetMapperFactory;
+
 class PreparedStatementBuilder implements StatementBuilder {
     private final Map<String, Object> parameters;
     private String sql;
     private DatabaseContext context;
-    private ResultSetMapper resultSetMapper;
+    private ResultSetMapperFactory resultSetMapperFactory;
 
     private static final Pattern validParameterName = Pattern.compile("^\\w+$");
     private static final Pattern parameterPattern = Pattern.compile("(@(\\w+))");
@@ -31,7 +34,7 @@ class PreparedStatementBuilder implements StatementBuilder {
     public PreparedStatementBuilder() {
         super();
         this.parameters = new HashMap<String, Object>();
-        this.resultSetMapper = new SimpleResultSetMapper();
+        this.resultSetMapperFactory = new SimpleResultSetMapperFactory();
     }
 
     public PreparedStatementBuilder(String sql) {
@@ -93,12 +96,12 @@ class PreparedStatementBuilder implements StatementBuilder {
     public <E> List<E> toListOf(Class<E> targetClass) throws SQLException {
         return withResultSet((ResultSet resultSet) -> {
             var list = new ArrayList<E>();
-            Function<ResultSet, E> mapper = null;
+            ResultSetMapper mapper = null;
             while (resultSet.next()) {
                 if (mapper == null) {
-                    mapper = resultSetMapper.compileMapper(targetClass, resultSet.getMetaData());
+                    mapper = resultSetMapperFactory.CreateResultSetMapper(targetClass);
                 }
-                var instance = mapper.apply(resultSet);
+                var instance = mapper.MapResultSet(resultSet, targetClass);
                 list.add(instance);
             }
             return list;
@@ -107,9 +110,8 @@ class PreparedStatementBuilder implements StatementBuilder {
 
     public <E> Stream<E> stream(Class<E> targetClass) throws SQLException {
         return withResultSet((ResultSet resultSet) -> {
-            var resultSetMetadata = resultSet.getMetaData();
-            var mapper = resultSetMapper.compileMapper(targetClass, resultSetMetadata);
-            return stream(resultSet, mapper);
+            var mapper = resultSetMapperFactory.CreateResultSetMapper(targetClass);
+            return stream(resultSet, mapper, targetClass);
         });
     }
 
@@ -118,9 +120,8 @@ class PreparedStatementBuilder implements StatementBuilder {
         return withResultSet((ResultSet resultSet) -> {
             E instance = null;
             if (resultSet.next()) {
-                var resultSetMetadata = resultSet.getMetaData();
-                var mapper = resultSetMapper.compileMapper(targetClass, resultSetMetadata);
-                instance = mapper.apply(resultSet);
+                var mapper = resultSetMapperFactory.CreateResultSetMapper(targetClass);
+                instance = mapper.MapResultSet(resultSet, targetClass);
             }
             return Optional.ofNullable(instance);
         });
@@ -141,18 +142,20 @@ class PreparedStatementBuilder implements StatementBuilder {
         }
     }
 
-    private <E> Stream<E> stream(ResultSet resultSet, Function<ResultSet, E> mapper) {
+    private <E> Stream<E> stream(ResultSet resultSet, ResultSetMapper mapper, Class<E> targetClass) {
         return StreamSupport.stream(new Spliterators.AbstractSpliterator<E>(Long.MAX_VALUE, Spliterator.ORDERED) {
             @Override
             public boolean tryAdvance(Consumer<? super E> action) {
                 try {
-                    if (!resultSet.next())
+                    if (!resultSet.next()) {
                         return false;
-                } catch (SQLException e) {
+                    }
+                    action.accept(mapper.MapResultSet(resultSet, targetClass));
+                    return true;
+
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-                action.accept(mapper.apply(resultSet));
-                return true;
             }
         }, false);
     }

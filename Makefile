@@ -15,7 +15,7 @@ clean:
 clean-databases: 
 	docker-compose down -v
 
-wait-for=docker-compose run --rm wait-for
+wait-for=docker-compose run --rm wait-for -t 90
 
 docker-compose-up:
 	docker-compose up --no-start

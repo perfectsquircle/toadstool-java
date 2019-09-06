@@ -1,4 +1,4 @@
-package toadstool;
+package toadstool.mapper;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -12,24 +12,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-class SimpleResultSetMapper implements ResultSetMapper {
-    public <E> ThrowingFunction<ResultSet, E> compileMapper(Class<E> targetClass, ResultSetMetaData resultSetMetadata)
-            throws Exception {
-        var columnToPropertyMap = createColumnToPropertyMap(targetClass, resultSetMetadata);
+class ClassResultSetMapper implements ResultSetMapper {
+    private Map<String, Method> columnToPropertyMap;
 
-        return (resultSet) -> {
-            var instance = targetClass.getDeclaredConstructor().newInstance();
-            var typedInstance = targetClass.cast(instance);
+    @Override
+    public <E> E MapResultSet(ResultSet resultSet, Class<E> targetClass) throws Exception {
+        if (columnToPropertyMap == null) {
+            columnToPropertyMap = createColumnToPropertyMap(targetClass, resultSet.getMetaData());
+        }
+        var instance = targetClass.getDeclaredConstructor().newInstance();
+        var typedInstance = targetClass.cast(instance);
 
-            for (var columnName : columnToPropertyMap.keySet()) {
-                var setter = columnToPropertyMap.get(columnName);
-                if (setter.canAccess(typedInstance)) {
-                    setter.invoke(typedInstance, resultSet.getObject(columnName));
-                }
+        for (var columnName : columnToPropertyMap.keySet()) {
+            var setter = columnToPropertyMap.get(columnName);
+            if (setter.canAccess(typedInstance)) {
+                setter.invoke(typedInstance, resultSet.getObject(columnName));
             }
+        }
 
-            return typedInstance;
-        };
+        return typedInstance;
     }
 
     public <E> Map<String, Method> createColumnToPropertyMap(Class<E> targetClass, ResultSetMetaData resultSetMetadata)
@@ -63,11 +64,7 @@ class SimpleResultSetMapper implements ResultSetMapper {
         return map;
     }
 
-    private Collection<String> getVariants(String s) {
-        return List.of(
-                s,
-                s.toLowerCase(),
-                s.replaceAll("_", ""),
-                s.replaceAll("_", "").toLowerCase());
+    private static Collection<String> getVariants(String s) {
+        return List.of(s, s.toLowerCase(), s.replaceAll("_", ""), s.replaceAll("_", "").toLowerCase());
     }
 }
