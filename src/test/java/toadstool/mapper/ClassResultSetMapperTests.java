@@ -1,4 +1,4 @@
-package toadstool;
+package toadstool.mapper;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -12,13 +12,13 @@ import java.util.Date;
 
 import org.junit.Test;
 
-public class SimpleResultSetMapperTests {
+public class ClassResultSetMapperTests {
     @Test
     public void ShouldBeConstructable() {
         // Given
 
         // When
-        var mapper = new SimpleResultSetMapper();
+        var mapper = new ClassResultSetMapper();
 
         // Then
         assertNotNull(mapper);
@@ -33,7 +33,7 @@ public class SimpleResultSetMapperTests {
         when(resultSetMetadata.getColumnName(2)).thenReturn("name");
         when(resultSetMetadata.getColumnName(3)).thenReturn("create_date");
         when(resultSetMetadata.getColumnName(4)).thenReturn("cant_touch_this");
-        var mapper = new SimpleResultSetMapper();
+        var mapper = new ClassResultSetMapper();
         var aSetter = Bar.class.getMethod("setId", int.class);
         var bSetter = Bar.class.getMethod("setName", String.class);
         var cSetter = Bar.class.getMethod("setCreateDate", Date.class);
@@ -51,7 +51,7 @@ public class SimpleResultSetMapperTests {
     }
 
     @Test
-    public void ShouldCompileMapper() throws Exception {
+    public void ShouldMapResultSet() throws Exception {
         // Given
         var id = 777;
         var name = "Willy";
@@ -65,17 +65,16 @@ public class SimpleResultSetMapperTests {
         when(resultSetMetadata.getColumnName(4)).thenReturn("create_date");
         when(resultSetMetadata.getColumnName(5)).thenReturn("cant_touch_this");
         var resultSet = mock(ResultSet.class);
+        when(resultSet.getMetaData()).thenReturn(resultSetMetadata);
         when(resultSet.getObject("id")).thenReturn(id);
         when(resultSet.getObject("name")).thenReturn(name);
         when(resultSet.getObject("stock_price")).thenReturn(stockPrice);
         when(resultSet.getObject("create_date")).thenReturn(createDate);
         when(resultSet.getObject("cant_touch_this")).thenReturn("nope");
-        var mapper = new SimpleResultSetMapper();
+        var mapper = new ClassResultSetMapper();
 
         // When
-        var compiledMapper = mapper.compileMapper(Bar.class, resultSetMetadata);
-        assertNotNull(compiledMapper);
-        var result = compiledMapper.apply(resultSet);
+        var result = mapper.MapResultSet(resultSet, Bar.class);
 
         // Then
         assertNotNull(result);

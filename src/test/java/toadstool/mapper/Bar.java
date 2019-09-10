@@ -1,4 +1,4 @@
-package toadstool;
+package toadstool.mapper;
 
 import java.util.Date;
 
