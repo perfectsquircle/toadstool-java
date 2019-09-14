@@ -2,40 +2,43 @@ package toadstool.mapper;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
-import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import toadstool.ToadstoolException;
 
 class ClassResultSetMapper implements ResultSetMapper {
-    private Map<String, Method> columnToPropertyMap;
+    private List<PropertyMapper> propertyMappers;
 
     @Override
     public <E> E MapResultSet(ResultSet resultSet, Class<E> targetClass) throws Exception {
-        if (columnToPropertyMap == null) {
-            columnToPropertyMap = createColumnToPropertyMap(targetClass, resultSet.getMetaData());
+        var declaredConstructor = targetClass.getDeclaredConstructor();
+        if (declaredConstructor == null) {
+            throw new ToadstoolException("Target class must have no-args constructor.");
         }
-        var instance = targetClass.getDeclaredConstructor().newInstance();
+        var instance = declaredConstructor.newInstance();
         var typedInstance = targetClass.cast(instance);
 
-        for (var columnName : columnToPropertyMap.keySet()) {
-            var setter = columnToPropertyMap.get(columnName);
-            if (setter.canAccess(typedInstance)) {
-                setter.invoke(typedInstance, resultSet.getObject(columnName));
-            }
+        if (propertyMappers == null) {
+            propertyMappers = createPropertyMappers(targetClass, resultSet.getMetaData());
+        }
+
+        for (var propertyMapper : propertyMappers) {
+            propertyMapper.mapProperty(resultSet, typedInstance);
         }
 
         return typedInstance;
     }
 
-    public <E> Map<String, Method> createColumnToPropertyMap(Class<E> targetClass, ResultSetMetaData resultSetMetadata)
-            throws SQLException, IntrospectionException {
-        var map = new HashMap<String, Method>();
+    private static <E> List<PropertyMapper> createPropertyMappers(Class<E> targetClass,
+            ResultSetMetaData resultSetMetadata)
+            throws SQLException, IntrospectionException, ClassNotFoundException {
+        var list = new ArrayList<PropertyMapper>();
         var beanInfo = Introspector.getBeanInfo(targetClass);
         var propertyDescriptors = Arrays.asList(beanInfo.getPropertyDescriptors());
 
@@ -54,17 +57,30 @@ class ClassResultSetMapper implements ResultSetMapper {
                 continue;
             }
 
-            var writeMethod = match.get().getWriteMethod();
+            var property = match.get();
+            var writeMethod = property.getWriteMethod();
             if (writeMethod == null) {
                 continue;
             }
-            map.put(columnName, writeMethod);
+            var parameterTypes = writeMethod.getParameterTypes();
+            if (parameterTypes.length != 1) {
+                continue;
+            }
+            var mapper = new PropertyMapper()
+                    .WithColumnName(columnName)
+                    .WithPropertySetter(writeMethod)
+                    .WithPropertyType(parameterTypes[0]);
+            list.add(mapper);
         }
 
-        return map;
+        return list;
     }
 
     private static Collection<String> getVariants(String s) {
-        return List.of(s, s.toLowerCase(), s.replaceAll("_", ""), s.replaceAll("_", "").toLowerCase());
+        return List.of(
+                s,
+                s.toLowerCase(),
+                s.replaceAll("_", ""),
+                s.replaceAll("_", "").toLowerCase());
     }
 }

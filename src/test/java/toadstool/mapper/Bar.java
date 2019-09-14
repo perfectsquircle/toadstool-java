@@ -5,7 +5,7 @@ import java.util.Date;
 public class Bar {
     private int id;
     private String name;
-    private Double stockPrice;
+    private double stockPrice;
     private String cantTouchThis = "Stop. Hammer time.";
     private Date createDate;
 
@@ -13,11 +13,11 @@ public class Bar {
         return id;
     }
 
-    public Double getStockPrice() {
+    public double getStockPrice() {
         return stockPrice;
     }
 
-    public void setStockPrice(Double stockPrice) {
+    public void setStockPrice(double stockPrice) {
         this.stockPrice = stockPrice;
     }
 
