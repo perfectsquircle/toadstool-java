@@ -19,7 +19,6 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import toadstool.DatabaseContext;
-import toadstool.StatementBuilder;
 import toadstool.mapper.ResultSetMapper;
 import toadstool.mapper.ResultSetMapperFactory;
 import toadstool.mapper.SimpleResultSetMapperFactory;
@@ -31,6 +30,7 @@ public class PreparedStatementBuilder implements StatementBuilder {
     private String sql;
     private DatabaseContext context;
     private ResultSetMapperFactory resultSetMapperFactory;
+    private boolean closeConnection;
 
     private static final Pattern validParameterName = Pattern.compile("^\\w+$");
     private static final Pattern parameterPattern = Pattern.compile("(@(\\w+))");
@@ -48,8 +48,13 @@ public class PreparedStatementBuilder implements StatementBuilder {
     }
 
     public StatementBuilder withContext(DatabaseContext context) {
+        return withContext(context, true);
+    }
+
+    public StatementBuilder withContext(DatabaseContext context, boolean closeConnection) {
         Objects.requireNonNull(context);
         this.context = context;
+        this.closeConnection = closeConnection;
         return this;
     }
 
@@ -139,10 +144,14 @@ public class PreparedStatementBuilder implements StatementBuilder {
     }
 
     private <E> E withResultSet(ThrowingFunction<ResultSet, E> callback) throws SQLException {
-        try (var connection = this.context.getConnection();
-                var preparedStatement = this.build(connection);
+        var connection = this.context.getConnection();
+        try (var preparedStatement = this.build(connection);
                 var resultSet = preparedStatement.executeQuery();) {
             return callback.apply(resultSet);
+        } finally {
+            if (closeConnection && !connection.isClosed()) {
+                connection.close();
+            }
         }
     }
 

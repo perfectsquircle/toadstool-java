@@ -127,4 +127,23 @@ public class IntegrationTest {
         assertNotNull(first.getD());
         assertEquals(66, first.getF());
     }
+
+    @Test
+    public void testTransaction() throws SQLException {
+        var context = new SimpleDatabaseContext(connectionString, user, password);
+
+        try (var transaction = context.beginTransaction()) {
+            var result = transaction
+                    .prepareStatement("select 1 as a, 2 as b, 3 as c, 4 as d where 'bar' = @foo")
+                    .withParameter("foo", "bar")
+                    .first(Foo.class);
+
+            var result2 = transaction
+                    .prepareStatement("select 1 as a, 2 as b, 3 as c, 4 as d where 'bar' = @foo")
+                    .withParameter("foo", "bar")
+                    .first(Foo.class);
+
+            transaction.commit();
+        }
+    }
 }

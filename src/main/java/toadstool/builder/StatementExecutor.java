@@ -1,4 +1,4 @@
-package toadstool;
+package toadstool.builder;
 
 import java.sql.SQLException;
 import java.util.List;

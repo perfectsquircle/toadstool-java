@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import toadstool.builder.PreparedStatementBuilder;
+import toadstool.builder.StatementBuilder;
 
 public class SimpleDatabaseContext implements DatabaseContext {
     private final String url;
@@ -44,5 +45,12 @@ public class SimpleDatabaseContext implements DatabaseContext {
     public StatementBuilder prepareStatement(String sql) throws SQLException {
         Objects.requireNonNull(sql);
         return new PreparedStatementBuilder(sql).withContext(this);
+    }
+
+    @Override
+    public TransactionContext beginTransaction() throws SQLException {
+        var connection = getConnection();
+        connection.setAutoCommit(false);
+        return new TransactionContext(connection);
     }
 }
