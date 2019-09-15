@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.util.Objects;
 import java.util.Optional;
 
+import toadstool.builder.PreparedStatementBuilder;
+
 public class SimpleDatabaseContext implements DatabaseContext {
     private final String url;
     private final Optional<String> user;

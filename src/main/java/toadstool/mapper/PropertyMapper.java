@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import toadstool.ToadstoolException;
+import toadstool.util.ToadstoolException;
 
 class PropertyMapper {
     private String columnName;

@@ -1,16 +1,11 @@
-pack:
-	dotnet pack src/Toadstool -o ../../out --include-symbols --include-source -c Release
+assemble:
+	./gradlew assemble
 
-local:
-	dotnet pack src/Toadstool/ -o ../../out --version-suffix=beta-`date +%s`
-	nuget push out/*.nupkg -Source Local
-
-.PHONY: test
 test:
 	./gradlew test --info
 
 clean:
-	rm -vrf build
+	./gradlew clean
 
 clean-databases: 
 	docker-compose down -v

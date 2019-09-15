@@ -1,4 +1,4 @@
-package toadstool;
+package toadstool.builder;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,11 +18,15 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import toadstool.DatabaseContext;
+import toadstool.StatementBuilder;
 import toadstool.mapper.ResultSetMapper;
 import toadstool.mapper.ResultSetMapperFactory;
 import toadstool.mapper.SimpleResultSetMapperFactory;
+import toadstool.util.Pair;
+import toadstool.util.ThrowingFunction;
 
-class PreparedStatementBuilder implements StatementBuilder {
+public class PreparedStatementBuilder implements StatementBuilder {
     private final Map<String, Object> parameters;
     private String sql;
     private DatabaseContext context;
@@ -43,7 +47,7 @@ class PreparedStatementBuilder implements StatementBuilder {
         this.sql = sql;
     }
 
-    StatementBuilder withContext(DatabaseContext context) {
+    public StatementBuilder withContext(DatabaseContext context) {
         Objects.requireNonNull(context);
         this.context = context;
         return this;

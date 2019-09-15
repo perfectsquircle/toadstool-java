@@ -2,6 +2,7 @@ package toadstool.mapper;
 
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
+import java.lang.reflect.Constructor;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -10,16 +11,14 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import toadstool.ToadstoolException;
-
 class ClassResultSetMapper implements ResultSetMapper {
     private List<PropertyMapper> propertyMappers;
+    private Constructor<?> declaredConstructor;
 
     @Override
     public <E> E MapResultSet(ResultSet resultSet, Class<E> targetClass) throws Exception {
-        var declaredConstructor = targetClass.getDeclaredConstructor();
         if (declaredConstructor == null) {
-            throw new ToadstoolException("Target class must have no-args constructor.");
+            declaredConstructor = targetClass.getDeclaredConstructor();
         }
         var instance = declaredConstructor.newInstance();
         var typedInstance = targetClass.cast(instance);

@@ -1,6 +1,6 @@
-package toadstool;
+package toadstool.util;
 
-class Pair<A, B> {
+public class Pair<A, B> {
     public A left;
     public B right;
 

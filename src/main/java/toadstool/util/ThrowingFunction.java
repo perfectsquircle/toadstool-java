@@ -1,9 +1,9 @@
-package toadstool;
+package toadstool.util;
 
 import java.util.function.Function;
 
 @FunctionalInterface
-interface ThrowingFunction<T, R> extends Function<T, R> {
+public interface ThrowingFunction<T, R> extends Function<T, R> {
 
     @Override
     default R apply(final T elem) {

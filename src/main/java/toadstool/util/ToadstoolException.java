@@ -1,6 +1,6 @@
-package toadstool;
+package toadstool.util;
 
-public class ToadstoolException extends Exception {
+public class ToadstoolException extends RuntimeException {
     public ToadstoolException(String message) {
         super(message);
     }
