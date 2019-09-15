@@ -18,19 +18,21 @@ public class IntegrationTest {
     @Parameters(name = "connectionStrings")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][] {
-                {"jdbc:postgresql://localhost:5432/postgres", "postgres", "toadstool"},
-                {"jdbc:sqlserver://localhost:1433;", "SA", "Toadstool123"},
+                { "jdbc:postgresql://localhost:5432/postgres", "postgres", "toadstool" },
+                { "jdbc:sqlserver://localhost:1433;", "SA", "Toadstool123" },
         });
     }
 
     private String connectionString;
     private String user;
     private String password;
+    private boolean isPostgres;
 
     public IntegrationTest(String connectionString, String user, String password) {
         this.connectionString = connectionString;
         this.user = user;
         this.password = password;
+        this.isPostgres = connectionString.contains("postgresql");
     }
 
     @Test
@@ -102,5 +104,27 @@ public class IntegrationTest {
         assertEquals(1, first.getA());
         assertEquals(2, first.getB());
         assertEquals(3, first.getC());
+    }
+
+    @Test
+    public void testTypeMapping() throws SQLException {
+        var context = new SimpleDatabaseContext(connectionString, user, password);
+
+        var result = context
+                .prepareStatement(
+                        isPostgres
+                                ? "select 1 as a, 2.0 as b, 'three' as c, now() as d, 66 as f"
+                                : "select 1 as a, 2.0 as b, 'three' as c, getdate() as d, 66 as f")
+                .first(Baz.class);
+
+        assertNotNull(result);
+        assertTrue("Optional must not be empty", result.isPresent());
+        var first = result.get();
+        assertNotNull(first);
+        assertEquals(1, first.getA());
+        assertEquals(2.0d, first.getB(), 0.1d);
+        assertEquals("three", first.getC());
+        assertNotNull(first.getD());
+        assertEquals(66, first.getF());
     }
 }

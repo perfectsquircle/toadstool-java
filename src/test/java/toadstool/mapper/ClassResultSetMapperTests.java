@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-import java.util.Date;
 
 import org.junit.Test;
 
@@ -25,52 +24,30 @@ public class ClassResultSetMapperTests {
     }
 
     @Test
-    public void ShouldCreateColumnToPropertyMap() throws Exception {
-        // Given
-        var resultSetMetadata = mock(ResultSetMetaData.class);
-        when(resultSetMetadata.getColumnCount()).thenReturn(4);
-        when(resultSetMetadata.getColumnName(1)).thenReturn("id");
-        when(resultSetMetadata.getColumnName(2)).thenReturn("name");
-        when(resultSetMetadata.getColumnName(3)).thenReturn("create_date");
-        when(resultSetMetadata.getColumnName(4)).thenReturn("cant_touch_this");
-        var mapper = new ClassResultSetMapper();
-        var aSetter = Bar.class.getMethod("setId", int.class);
-        var bSetter = Bar.class.getMethod("setName", String.class);
-        var cSetter = Bar.class.getMethod("setCreateDate", Date.class);
-
-        // When
-        var result = mapper.createColumnToPropertyMap(Bar.class, resultSetMetadata);
-
-        // Then
-        assertNotNull(result);
-        assertEquals(3, result.size());
-        assertEquals(aSetter, result.get("id"));
-        assertEquals(bSetter, result.get("name"));
-        assertEquals(cSetter, result.get("create_date"));
-        assertNull(result.get("cant_touch_this"));
-    }
-
-    @Test
     public void ShouldMapResultSet() throws Exception {
         // Given
         var id = 777;
         var name = "Willy";
-        var stockPrice = (Double) null;
-        var createDate = new Date();
+        var stockPrice = 77.77d;
+        var createDate = new java.sql.Date(999);
         var resultSetMetadata = mock(ResultSetMetaData.class);
-        when(resultSetMetadata.getColumnCount()).thenReturn(5);
+        when(resultSetMetadata.getColumnCount()).thenReturn(7);
         when(resultSetMetadata.getColumnName(1)).thenReturn("id");
         when(resultSetMetadata.getColumnName(2)).thenReturn("stock_price");
         when(resultSetMetadata.getColumnName(3)).thenReturn("name");
         when(resultSetMetadata.getColumnName(4)).thenReturn("create_date");
         when(resultSetMetadata.getColumnName(5)).thenReturn("cant_touch_this");
+        when(resultSetMetadata.getColumnName(6)).thenReturn("integer_bob");
+        when(resultSetMetadata.getColumnName(7)).thenReturn("nullable_bob");
         var resultSet = mock(ResultSet.class);
         when(resultSet.getMetaData()).thenReturn(resultSetMetadata);
-        when(resultSet.getObject("id")).thenReturn(id);
-        when(resultSet.getObject("name")).thenReturn(name);
-        when(resultSet.getObject("stock_price")).thenReturn(stockPrice);
-        when(resultSet.getObject("create_date")).thenReturn(createDate);
-        when(resultSet.getObject("cant_touch_this")).thenReturn("nope");
+        when(resultSet.getInt("id")).thenReturn(id);
+        when(resultSet.getString("name")).thenReturn(name);
+        when(resultSet.getDouble("stock_price")).thenReturn(stockPrice);
+        when(resultSet.getDate("create_date")).thenReturn(createDate);
+        when(resultSet.getString("cant_touch_this")).thenReturn("nope");
+        when(resultSet.getObject("integer_bob")).thenReturn((Integer) 3);
+        when(resultSet.getObject("nullable_bob")).thenReturn((Integer) null);
         var mapper = new ClassResultSetMapper();
 
         // When
@@ -80,9 +57,11 @@ public class ClassResultSetMapperTests {
         assertNotNull(result);
         assertEquals(id, result.getId());
         assertEquals(name, result.getName());
-        assertEquals(stockPrice, result.getStockPrice());
+        assertEquals(stockPrice, result.getStockPrice(), 0.1d);
         assertEquals(createDate, result.getCreateDate());
         assertEquals("Stop. Hammer time.", result.getCantTouchThis());
+        assertEquals((Integer) 3, result.getIntegerBob());
+        assertEquals((Integer) null, result.getNullableBob());
 
     }
 }
