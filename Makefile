@@ -13,11 +13,12 @@ clean-databases:
 wait-for=docker-compose run --rm wait-for -t 90
 
 docker-compose-up:
+	docker-compose build
 	docker-compose up --no-start
 
 postgres: docker-compose-up
 	docker-compose start postgres
-	$(wait-for) toadstool_postgres_db:5432 
+	$(wait-for) toadstool_postgres_db:5432
 
 sqlserver: docker-compose-up
 	docker-compose start sqlserver

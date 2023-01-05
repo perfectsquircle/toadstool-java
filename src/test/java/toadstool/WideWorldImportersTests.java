@@ -12,7 +12,7 @@ public class WideWorldImportersTests {
     @Parameters(name = "connectionStrings")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][] {
-                { "jdbc:postgresql://localhost:5432/wide_world_importers_pg", "postgres", "toadstool" },
+                { "jdbc:postgresql://localhost:54321/wide_world_importers_pg", "toadstool", "toadstool" },
                 { "jdbc:sqlserver://localhost:1433;Database=WideWorldImporters", "SA", "Toadstool123" },
         });
     }

@@ -83,17 +83,17 @@ class PropertyMapper {
         return resultSet.getObject(columnName);
     }
 
-    public PropertyMapper WithColumnName(String columnName) {
+    public PropertyMapper withColumnName(String columnName) {
         this.columnName = columnName;
         return this;
     }
 
-    public PropertyMapper WithPropertySetter(Method propertySetter) {
+    public PropertyMapper withPropertySetter(Method propertySetter) {
         this.propertySetter = propertySetter;
         return this;
     }
 
-    public PropertyMapper WithPropertyType(Class<?> propertyType) {
+    public PropertyMapper withPropertyType(Class<?> propertyType) {
         this.propertyType = propertyType;
         return this;
     }
