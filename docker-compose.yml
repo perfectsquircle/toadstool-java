@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   postgres:
     container_name: toadstool_postgres_db
@@ -8,8 +8,8 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: toadstool
-    ports:  
-      - 5432:5432
+    ports:
+      - 54321:5432
   sqlserver:
     container_name: toadstool_sqlserver_db
     build:
@@ -19,7 +19,7 @@ services:
     environment:
       ACCEPT_EULA: Y
       SA_PASSWORD: Toadstool123
-    ports:  
+    ports:
       - 1433:1433
   wait-for:
     image: gesellix/wait-for

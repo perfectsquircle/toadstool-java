@@ -18,7 +18,7 @@ public class IntegrationTest {
     @Parameters(name = "connectionStrings")
     public static Iterable<Object[]> data() {
         return Arrays.asList(new Object[][] {
-                { "jdbc:postgresql://localhost:5432/postgres", "postgres", "toadstool" },
+                { "jdbc:postgresql://localhost:54321/postgres", "toadstool", "toadstool" },
                 { "jdbc:sqlserver://localhost:1433;", "SA", "Toadstool123" },
         });
     }

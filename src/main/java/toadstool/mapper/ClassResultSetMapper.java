@@ -66,9 +66,9 @@ class ClassResultSetMapper implements ResultSetMapper {
                 continue;
             }
             var mapper = new PropertyMapper()
-                    .WithColumnName(columnName)
-                    .WithPropertySetter(writeMethod)
-                    .WithPropertyType(parameterTypes[0]);
+                    .withColumnName(columnName)
+                    .withPropertySetter(writeMethod)
+                    .withPropertyType(parameterTypes[0]);
             list.add(mapper);
         }
 

@@ -6,7 +6,7 @@
 // Do a SELECT then map the results to a list.
 List<Customer> customers = context
     .prepareStatement("SELECT first_name, last_name FROM customer WHERE last_name = @lastName")
-    .withParameter("lastName", "Cuervo")
+    .withParameter("lastName", "Doe")
     .toListOf(Customer.class);
 ```
 
@@ -35,27 +35,27 @@ class Customer {
 // Do a SELECT then map the results to a list.
 List<Customer> customers = context
     .prepareStatement("SELECT first_name, last_name FROM customer WHERE last_name = @lastName")
-    .withParameter("lastName", "Cuervo")
+    .withParameter("lastName", "Doe")
     .toListOf(Customer.class);
 
 // Execute an INSERT
 int rowsAffected = context
     .prepareStatement("INSERT INTO customer(fist_name, last_name) VALUES (@firstName, @lastName)")
-    .withParameter("firstName", "Jose")
-    .withParameter("lastName", "Cuervo")
+    .withParameter("firstName", "John")
+    .withParameter("lastName", "Doe")
     .execute();
 
 // Execute an UPDATE
 int rowsAffected = context
     .prepareStatement("UPDATE customer SET first_name = @firstName where last_name = @lastName")
     .withParameter("firstName", "Jerry")
-    .withParameter("lastName", "Cuervo")
+    .withParameter("lastName", "Doe")
     .execute();
 
 // Execute a DELETE
 int rowsAffected = context
     .prepareStatement("DELETE FROM customer where last_name = @lastName")
-    .withParameter("lastName", "Cuervo")
+    .withParameter("lastName", "Doe")
     .execute();
 ```
 
