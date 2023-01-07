@@ -20,19 +20,20 @@ public class IntegrationTest {
         return Arrays.asList(new Object[][] {
                 { "jdbc:postgresql://localhost:54321/postgres", "toadstool", "toadstool" },
                 { "jdbc:sqlserver://localhost:1433;", "SA", "Toadstool123" },
+                { "jdbc:mysql://localhost:3306/sakila", "toadstool", "toadstool" },
         });
     }
 
     private String connectionString;
     private String user;
     private String password;
-    private boolean isPostgres;
+    private String kind;
 
     public IntegrationTest(String connectionString, String user, String password) {
         this.connectionString = connectionString;
         this.user = user;
         this.password = password;
-        this.isPostgres = connectionString.contains("postgresql");
+        this.kind = connectionString.split(":")[1];
     }
 
     @Test
@@ -112,9 +113,11 @@ public class IntegrationTest {
 
         var result = context
                 .prepareStatement(
-                        isPostgres
-                                ? "select 1 as a, 2.0 as b, 'three' as c, now() as d, 66 as f"
-                                : "select 1 as a, 2.0 as b, 'three' as c, getdate() as d, 66 as f")
+                        switch (kind) {
+                            case "postgresql", "mysql" -> "select 1 as a, 2.0 as b, 'three' as c, now() as d, 66 as f";
+                            case "sqlserver" -> "select 1 as a, 2.0 as b, 'three' as c, getdate() as d, 66 as f";
+                            default -> throw new IllegalStateException("Unsupported kind: " + kind);
+                        })
                 .first(Baz.class);
 
         assertNotNull(result);
