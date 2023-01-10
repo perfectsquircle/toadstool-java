@@ -118,10 +118,22 @@ public class PreparedStatementBuilder implements StatementBuilder {
     }
 
     public <E> Stream<E> stream(Class<E> targetClass) throws SQLException {
-        return withResultSet((ResultSet resultSet) -> {
-            var mapper = resultSetMapperFactory.CreateResultSetMapper(targetClass);
-            return stream(resultSet, mapper, targetClass);
+        var connection = this.context.getConnection();
+        var preparedStatement = this.build(connection);
+        var resultSet = preparedStatement.executeQuery();
+        var mapper = resultSetMapperFactory.CreateResultSetMapper(targetClass);
+        return stream(resultSet, mapper, targetClass).onClose(() -> {
+            try {
+                preparedStatement.close();
+                resultSet.close();
+                if (closeConnection && !connection.isClosed()) {
+                    connection.close();
+                }
+            } catch (final Exception e) {
+                throw new RuntimeException(e);
+            }
         });
+
     }
 
     @Override
