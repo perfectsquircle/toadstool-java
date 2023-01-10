@@ -11,8 +11,11 @@ class PropertyMapper {
     private Method propertySetter;
     private Class<?> propertyType;
 
-    public PropertyMapper() {
+    public PropertyMapper(String columnName, Method propertySetter, Class<?> propertyType) {
         super();
+        this.columnName = columnName;
+        this.propertySetter = propertySetter;
+        this.propertyType = propertyType;
     }
 
     public <E> void mapProperty(ResultSet resultSet, E typedInstance)
@@ -81,20 +84,5 @@ class PropertyMapper {
         }
 
         return resultSet.getObject(columnName);
-    }
-
-    public PropertyMapper withColumnName(String columnName) {
-        this.columnName = columnName;
-        return this;
-    }
-
-    public PropertyMapper withPropertySetter(Method propertySetter) {
-        this.propertySetter = propertySetter;
-        return this;
-    }
-
-    public PropertyMapper withPropertyType(Class<?> propertyType) {
-        this.propertyType = propertyType;
-        return this;
     }
 }

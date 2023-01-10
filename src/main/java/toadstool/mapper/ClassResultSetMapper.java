@@ -8,7 +8,6 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 class ClassResultSetMapper implements ResultSetMapper {
@@ -39,14 +38,14 @@ class ClassResultSetMapper implements ResultSetMapper {
             throws SQLException, IntrospectionException, ClassNotFoundException {
         var list = new ArrayList<PropertyMapper>();
         var beanInfo = Introspector.getBeanInfo(targetClass);
-        var propertyDescriptors = Arrays.asList(beanInfo.getPropertyDescriptors());
+        var propertyDescriptors = beanInfo.getPropertyDescriptors();
 
         var columnCount = resultSetMetadata.getColumnCount();
         for (var i = 1; i <= columnCount; i++) {
             var columnName = resultSetMetadata.getColumnName(i);
             var columnNameVariants = getVariants(columnName);
 
-            var match = propertyDescriptors.stream().filter(propertyDescriptor -> {
+            var match = Arrays.stream(propertyDescriptors).filter(propertyDescriptor -> {
                 var propertyNameVariants = getVariants(propertyDescriptor.getName());
                 return propertyNameVariants.stream()
                         .anyMatch(propertyName -> columnNameVariants.contains(propertyName));
@@ -65,17 +64,14 @@ class ClassResultSetMapper implements ResultSetMapper {
             if (parameterTypes.length != 1) {
                 continue;
             }
-            var mapper = new PropertyMapper()
-                    .withColumnName(columnName)
-                    .withPropertySetter(writeMethod)
-                    .withPropertyType(parameterTypes[0]);
+            var mapper = new PropertyMapper(columnName, writeMethod, parameterTypes[0]);
             list.add(mapper);
         }
 
         return list;
     }
 
-    private static Collection<String> getVariants(String s) {
+    private static List<String> getVariants(String s) {
         return List.of(
                 s,
                 s.toLowerCase(),
