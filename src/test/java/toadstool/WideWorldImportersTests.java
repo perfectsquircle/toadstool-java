@@ -49,7 +49,29 @@ public class WideWorldImportersTests {
         var last = results.get(9);
         assertEquals(10, last.getStockItemID());
         assertEquals("USB food flash drive - chocolate bar", last.getStockItemName());
-        assertEquals("USB food flash drive - chocolate bar", last.getStockItemName());
+    }
+
+    @Test
+    public void shouldSelectStreamFromStockItems() throws Exception {
+        // Given
+        var query = isPostgres
+                ? "SELECT stock_item_id, stock_item_name FROM warehouse.stock_items ORDER BY stock_item_id LIMIT 10"
+                : "SELECT TOP 10 StockItemID, StockItemName FROM Warehouse.StockItems ORDER BY StockItemID";
+        var context = new SimpleDatabaseContext(connectionString, user, password);
+
+        // When
+        try (var results = context.prepareStatement(query).stream(StockItem.class)) {
+
+            // Then
+            assertNotNull(results);
+            var iterator = results.iterator();
+            var first = iterator.next();
+            assertEquals(1, first.getStockItemID());
+            assertEquals("USB missile launcher (Green)", first.getStockItemName());
+            var second = iterator.next();
+            assertEquals(2, second.getStockItemID());
+            assertEquals("USB rocket launcher (Gray)", second.getStockItemName());
+        }
     }
 
     @Test

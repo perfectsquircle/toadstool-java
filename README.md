@@ -72,7 +72,7 @@ try (var transaction = context.beginTransaction()) {
         .execute();
 
     int rowsAffected = transaction
-        .prepareStatement("INSERT INTO order(fist_name, last_name) VALUES (@productId, @quantity)")
+        .prepareStatement("INSERT INTO order(product_id, quantity) VALUES (@productId, @quantity)")
         .withParameter("productId", productId)
         .withParameter("quantity", quantity)
         .execute();
