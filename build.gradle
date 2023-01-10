@@ -28,4 +28,5 @@ dependencies {
     testImplementation 'org.postgresql:postgresql:42.2.6'
     testImplementation 'org.mockito:mockito-core:2.+'
     testImplementation 'com.microsoft.sqlserver:mssql-jdbc:6.1.0.jre7'
+    testImplementation 'mysql:mysql-connector-java:8.0.31'
 }

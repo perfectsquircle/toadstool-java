@@ -25,4 +25,8 @@ sqlserver: docker-compose-up
 	$(wait-for) toadstool_sqlserver_db:1433
 	docker exec -it toadstool_sqlserver_db bash ./import-data.sh
 
-databases: sqlserver postgres
+mysql: docker-compose-up
+	docker-compose start mysql
+	$(wait-for) toadstool_mysql_db:3306
+
+databases: sqlserver postgres mysql

@@ -21,5 +21,18 @@ services:
       SA_PASSWORD: Toadstool123
     ports:
       - 1433:1433
+  mysql:
+    container_name: toadstool_mysql_db
+    build:
+      context: databases/mysql
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: toadstool
+      MYSQL_DATABASE: sakila
+      MYSQL_USER: toadstool
+      MYSQL_PASSWORD: toadstool
+    ports:
+      - 3306:3306
   wait-for:
     image: gesellix/wait-for
