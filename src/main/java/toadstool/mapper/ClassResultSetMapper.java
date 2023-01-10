@@ -64,7 +64,7 @@ class ClassResultSetMapper implements ResultSetMapper {
             if (parameterTypes.length != 1) {
                 continue;
             }
-            var mapper = new PropertyMapper(columnName, writeMethod, parameterTypes[0]);
+            var mapper = new PropertyMapper(i, columnName, writeMethod, parameterTypes[0]);
             list.add(mapper);
         }
 

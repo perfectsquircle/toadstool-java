@@ -7,12 +7,14 @@ import java.sql.SQLException;
 import toadstool.util.ToadstoolException;
 
 class PropertyMapper {
-    private String columnName;
-    private Method propertySetter;
-    private Class<?> propertyType;
+    private final int columnIndex;
+    private final String columnName;
+    private final Method propertySetter;
+    private final Class<?> propertyType;
 
-    public PropertyMapper(String columnName, Method propertySetter, Class<?> propertyType) {
+    public PropertyMapper(int columnIndex, String columnName, Method propertySetter, Class<?> propertyType) {
         super();
+        this.columnIndex = columnIndex;
         this.columnName = columnName;
         this.propertySetter = propertySetter;
         this.propertyType = propertyType;
@@ -35,54 +37,53 @@ class PropertyMapper {
         }
     }
 
-    private Object getTypedObject(ResultSet resultSet) throws SQLException {
+    public Object getTypedObject(ResultSet resultSet) throws SQLException {
         if (propertyType.isAssignableFrom(String.class)) {
-            return resultSet.getString(columnName);
+            return resultSet.getString(columnIndex);
         }
         if (propertyType.isAssignableFrom(boolean.class)) {
-            return resultSet.getBoolean(columnName);
+            return resultSet.getBoolean(columnIndex);
         }
         if (propertyType.isAssignableFrom(byte.class)) {
-            return resultSet.getByte(columnName);
+            return resultSet.getByte(columnIndex);
         }
         if (propertyType.isAssignableFrom(short.class)) {
-            return resultSet.getShort(columnName);
+            return resultSet.getShort(columnIndex);
         }
         if (propertyType.isAssignableFrom(int.class)) {
-            return resultSet.getInt(columnName);
+            return resultSet.getInt(columnIndex);
         }
         if (propertyType.isAssignableFrom(long.class)) {
-            return resultSet.getLong(columnName);
+            return resultSet.getLong(columnIndex);
         }
         if (propertyType.isAssignableFrom(float.class)) {
-            return resultSet.getFloat(columnName);
+            return resultSet.getFloat(columnIndex);
         }
         if (propertyType.isAssignableFrom(double.class)) {
-            return resultSet.getDouble(columnName);
+            return resultSet.getDouble(columnIndex);
         }
         if (propertyType.isAssignableFrom(byte[].class)) {
-            return resultSet.getBytes(columnName);
+            return resultSet.getBytes(columnIndex);
         }
         if (propertyType.isAssignableFrom(java.sql.Date.class)) {
-            return resultSet.getDate(columnName);
+            return resultSet.getDate(columnIndex);
         }
         if (propertyType.isAssignableFrom(java.sql.Time.class)) {
-            return resultSet.getTime(columnName);
+            return resultSet.getTime(columnIndex);
         }
         if (propertyType.isAssignableFrom(java.sql.Timestamp.class)) {
-            return resultSet.getTimestamp(columnName);
+            return resultSet.getTimestamp(columnIndex);
         }
         if (propertyType.isAssignableFrom(java.io.InputStream.class)) {
-            return resultSet.getBinaryStream(columnName);
+            return resultSet.getBinaryStream(columnIndex);
         }
-
         if (propertyType.isAssignableFrom(java.time.Instant.class)) {
-            return resultSet.getTimestamp(columnName).toInstant();
+            return resultSet.getTimestamp(columnIndex).toInstant();
         }
         if (propertyType.isAssignableFrom(java.time.LocalDate.class)) {
-            return resultSet.getDate(columnName).toLocalDate();
+            return resultSet.getDate(columnIndex).toLocalDate();
         }
 
-        return resultSet.getObject(columnName);
+        return resultSet.getObject(columnIndex);
     }
 }

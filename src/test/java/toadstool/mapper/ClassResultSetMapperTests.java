@@ -41,13 +41,13 @@ public class ClassResultSetMapperTests {
         when(resultSetMetadata.getColumnName(7)).thenReturn("nullable_bob");
         var resultSet = mock(ResultSet.class);
         when(resultSet.getMetaData()).thenReturn(resultSetMetadata);
-        when(resultSet.getInt("id")).thenReturn(id);
-        when(resultSet.getString("name")).thenReturn(name);
-        when(resultSet.getDouble("stock_price")).thenReturn(stockPrice);
-        when(resultSet.getDate("create_date")).thenReturn(createDate);
-        when(resultSet.getString("cant_touch_this")).thenReturn("nope");
-        when(resultSet.getObject("integer_bob")).thenReturn((Integer) 3);
-        when(resultSet.getObject("nullable_bob")).thenReturn((Integer) null);
+        when(resultSet.getInt(1)).thenReturn(id);
+        when(resultSet.getDouble(2)).thenReturn(stockPrice);
+        when(resultSet.getString(3)).thenReturn(name);
+        when(resultSet.getDate(4)).thenReturn(createDate);
+        when(resultSet.getString(5)).thenReturn("nope");
+        when(resultSet.getObject(6)).thenReturn((Integer) 3);
+        when(resultSet.getObject(7)).thenReturn((Integer) null);
         var mapper = new ClassResultSetMapper();
 
         // When
